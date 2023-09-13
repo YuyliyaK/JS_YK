@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "0860eec4-d24b-49d5-9c82-45a6ebb7146f",
+		"name": "HW_3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21168131"
+	},
+	"item": [
+		{
+			"name": "Pokemon_1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonObj = pm.response.json();\r",
+							"const nameArray = [];\r",
+							"jsonObj.results.forEach(result => {\r",
+							"    const newObj = {};\r",
+							"    newObj.name = result.name;\r",
+							"    newObj.url = result.url;\r",
+							"    nameArray.push(JSON.stringify(newObj));\r",
+							"\r",
+							"});\r",
+							"pm.globals.set(\"nameArray\", JSON.stringify(nameArray));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/pokemon/?limit=30",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"pokemon",
+						""
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "30"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pokemon_2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const nw = eval(globals.nameArray);\r",
+							"for (let i = 0; i < nw.length; i++) { \r",
+							"  if (nw[i].includes(\"pikachu\") == true){   \r",
+							"      const newURL = nw[i].split('\"');\r",
+							"      pm.globals.set(\"urlPikachu\", newURL[7]);\r",
+							"      break;\r",
+							"  }\r",
+							"};\r",
+							"\r",
+							"//console.log(\"NotPikachu url is: \" + globals.urlNotPikachu);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonObj2 = pm.response.json();\r",
+							"console.log(jsonObj2)\r",
+							"//console.log(jsonObj2.pokemon_species_details[0].pokemon_species);\r",
+							"//const dataPikachu= jsonObj2.pokemon_species_details.find(pokemon_species => pokemon_species.name === \"bulbasaur\");\r",
+							"//console.log(dataPikachu)\r",
+							"\r",
+							"\r",
+							"pm.test(\"Pokemon type\", () => {\r",
+							"    pm.expect(jsonObj2.pokemon_species_details[25].pokemon_species.hasOwnProperty(\"pikachu\").true)\r",
+							"});\r",
+							"const checkPikachu = {\r",
+							"    name: \"male\",\r",
+							"    url: globals.urlNotPikachu,\r",
+							"};\r",
+							"//pm.test(\"Your test name\", function () {\r",
+							" //   var jsonData = pm.response.json();\r",
+							" //   pm.expect(jsonData.value).to.eql(100);\r",
+							"//});\r",
+							"pm.test(\"check Pikachu\", () =>{\r",
+							"    pm.expect(jsonObj2.to.deep.include(checkPikachu));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://pokeapi.co/api/v2/gender/male/",
+					"protocol": "https",
+					"host": [
+						"pokeapi",
+						"co"
+					],
+					"path": [
+						"api",
+						"v2",
+						"gender",
+						"male",
+						""
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "25",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "nameArray",
+			"value": ""
+		}
+	]
+}

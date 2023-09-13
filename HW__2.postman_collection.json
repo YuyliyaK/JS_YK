@@ -1,0 +1,233 @@
+{
+	"info": {
+		"_postman_id": "b531c509-1551-490e-a1a3-d6e2577403e2",
+		"name": "HW_2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21168131"
+	},
+	"item": [
+		{
+			"name": "HW_2.1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"function excluding_names(names1,names2){\r",
+							"    console.log(_.difference(names1,names2))}\r",
+							" \r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "httpbin.org/get",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"get"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "HW_2.4",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://rickandmortyapi.com/api/location/{{newID}}",
+					"protocol": "https",
+					"host": [
+						"rickandmortyapi",
+						"com"
+					],
+					"path": [
+						"api",
+						"location",
+						"{{newID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post HW_2_2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const moment = require(\"moment\");\r",
+							"const uid = require(\"uuid\");\r",
+							"pm.environment.set(\"date\", moment().format('MMMM Do YYYY'));\r",
+							"pm.environment.set(\"guid\", uid()); \r",
+							"pm.environment.set(\"randomString\", CryptoJS.SHA256(_.random(1000) + '{{$guid}}').toString()); "
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const ajv = require('ajv');\r",
+							"const ajvInstance = new ajv({logger: console});\r",
+							"const jsonObj = pm.response.json();\r",
+							"const schema = {\r",
+							"\r",
+							"            \"date\": \"string\",\r",
+							"            \"guid\": \"string\",\r",
+							"            \"randomString\": \"string\",\r",
+							"}\r",
+							"pm.test('valid', () => {\r",
+							"    pm.expect(ajvInstance.validate(schema, jsonObj)).to.be.true;    \r",
+							"});\r",
+							"if (ajvInstance.errors){\r",
+							"        console.log(\"Current schema issues:\");\r",
+							"        console.log(ajvInstance.errors);\r",
+							"        }\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": {{date}},\r\n    \"guid\": {{guid}},\r\n    \"randomString\": {{randomString}}\r\n}"
+				},
+				"url": {
+					"raw": "https://postman-echo.com/post",
+					"protocol": "https",
+					"host": [
+						"postman-echo",
+						"com"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "HW_2.3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"const jsonObj = pm.response.json();\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Check the Content-Type\", function () {\r",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.eql(\"application/json; charset=utf-8\");\r",
+							"});\r",
+							"const idMorty= jsonObj.results.find(result => result.name === \"Morty Smith\");\r",
+							"console.log(\"ID of Morty Smith it is \" + idMorty.id);\r",
+							"\r",
+							"const newID = idMorty.id+1;\r",
+							"const newURL = 'rickandmortyapi.com/api/character/' + newID;\r",
+							"console.log (newURL)\r",
+							"\r",
+							"pm.sendRequest(newURL,function(t){\r",
+							"   if (t){\r",
+							"      console.log('Wrong ID for user')\r",
+							"  } else  {\r",
+							"       const jsonObj2 = pm.response.json();\r",
+							"       console.log(jsonObj2.species)\r",
+							"   \r",
+							"       console.log(jsonObj2.species === \"Human\" ? \"Species = Human - true\":\"Species = Human - false\");\r",
+							"       console.log(typeof(jsonObj2.name) === \"string\" ? \"name's type = string - true\":\"name's type = string - false\");\r",
+							"       pm.test(\"Status code is 200\", function () {\r",
+							"           pm.response.to.have.status(200);\r",
+							"       });\r",
+							"      }\r",
+							"})\r",
+							"\r",
+							"\r",
+							"   "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://rickandmortyapi.com/api/character/",
+					"protocol": "https",
+					"host": [
+						"rickandmortyapi",
+						"com"
+					],
+					"path": [
+						"api",
+						"character",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
